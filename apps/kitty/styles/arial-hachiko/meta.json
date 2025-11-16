@@ -1,0 +1,6 @@
+{
+  "name": "arial-hachiko",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/kitty/kitty.conf"
+}

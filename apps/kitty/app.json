@@ -1,0 +1,4 @@
+{
+  "name": "kitty",
+  "reload_cmd": "pkill -USR1 kitty"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "nothingcord",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/Vencord/themes/current.css"
+}

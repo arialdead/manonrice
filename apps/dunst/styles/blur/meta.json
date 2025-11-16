@@ -1,0 +1,6 @@
+{
+  "name": "blur",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/dunst/dunstrc"
+}

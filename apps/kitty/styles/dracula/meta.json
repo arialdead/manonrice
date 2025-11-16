@@ -1,0 +1,6 @@
+{
+  "name": "Dracula",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/kitty/kitty.conf"
+}

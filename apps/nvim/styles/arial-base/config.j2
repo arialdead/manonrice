@@ -1,0 +1,279 @@
+-- {{ scheme_name | default("current") }} — Neovim colorscheme (Lua)
+-- author: {{ scheme_author | default("arial") }}
+-- Généré via Jinja2 à partir d'une palette pywal-like.
+
+vim.g.colors_name = "{{ scheme_name | default('current') }}"
+vim.o.termguicolors = true
+
+-- Transparence réelle (bg = "NONE"). Change true/false selon ton envie ou via Jinja.
+local TRANSPARENT = true
+local NONE = "NONE"
+local function bgc(c)
+	return TRANSPARENT and NONE or c
+end
+
+-- Palette
+local P = {
+	bg = "{{ background | default('#000000') }}",
+	fg = "{{ foreground | default('#ffffff') }}",
+	text = "{{ text | default(foreground) }}",
+	accent1 = "{{ accent1 | default(color12) }}",
+	accent2 = "{{ accent2 | default(color13) }}",
+
+	c0 = "{{ color0  | default('#000000') }}",
+	c1 = "{{ color1  | default('#ff5555') }}",
+	c2 = "{{ color2  | default('#50fa7b') }}",
+	c3 = "{{ color3  | default('#f1fa8c') }}",
+	c4 = "{{ color4  | default('#bd93f9') }}",
+	c5 = "{{ color5  | default('#ff79c6') }}",
+	c6 = "{{ color6  | default('#8be9fd') }}",
+	c7 = "{{ color7  | default('#bbbbbb') }}",
+	c8 = "{{ color8  | default('#555555') }}",
+	c9 = "{{ color9  | default('#ff6e6e') }}",
+	c10 = "{{ color10 | default('#69ff94') }}",
+	c11 = "{{ color11 | default('#ffffa5') }}",
+	c12 = "{{ color12 | default('#caa9fa') }}",
+	c13 = "{{ color13 | default('#ff92d0') }}",
+	c14 = "{{ color14 | default('#a4ffff') }}",
+	c15 = "{{ color15 | default('#eeeeee') }}",
+}
+
+-- Utilitaire HL
+local function hl(g, spec)
+	vim.api.nvim_set_hl(0, g, spec)
+end
+
+-- Helpers couleur (définis AVANT usage)
+local function hex_to_rgb(hex)
+	hex = hex:gsub("#", "")
+	return tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16)
+end
+
+local function rgb_to_hex(r, g, b)
+	local function clamp(x)
+		return math.max(0, math.min(255, x))
+	end
+	return string.format("#%02x%02x%02x", clamp(r), clamp(g), clamp(b))
+end
+
+-- Faux alpha: mélange avec une base (noir par défaut)
+local function blend(hex, base, alpha)
+	local r, g, b = hex_to_rgb(hex)
+	local rb, gb, bb = hex_to_rgb(base or "#000000")
+	local rn = math.floor(r * alpha + rb * (1 - alpha) + 0.5)
+	local gn = math.floor(g * alpha + gb * (1 - alpha) + 0.5)
+	local bn = math.floor(b * alpha + bb * (1 - alpha) + 0.5)
+	return rgb_to_hex(rn, gn, bn)
+end
+
+-- 40% de P.bg sur noir (assombri lisible pour certains éléments)
+local bg_40 = blend(P.bg, "#000000", 0.4)
+
+-- Terminal 16-colors
+for i, v in ipairs({
+	P.c0,
+	P.c1,
+	P.c2,
+	P.c3,
+	P.c4,
+	P.c5,
+	P.c6,
+	P.c7,
+	P.c8,
+	P.c9,
+	P.c10,
+	P.c11,
+	P.c12,
+	P.c13,
+	P.c14,
+	P.c15,
+}) do
+	vim.g["terminal_color_" .. (i - 1)] = v
+end
+
+-- Base UI (transparence pour les surfaces)
+hl("Normal", { fg = P.fg, bg = bgc(P.bg) })
+hl("NormalNC", { fg = P.fg, bg = bgc(P.bg) })
+hl("NormalFloat", { fg = P.fg, bg = bgc(P.bg) })
+hl("FloatBorder", { fg = P.c8, bg = bgc(P.bg) })
+hl("FloatTitle", { fg = P.c12, bg = bgc(P.bg), bold = true })
+hl("FloatFooter", { fg = P.c8, bg = bgc(P.bg) })
+hl("WinSeparator", { fg = P.c8, bg = bgc(P.bg) })
+
+-- Curseur / lignes (laisser visibles même en transparent)
+hl("Cursor", { fg = P.bg, bg = P.c12 })
+hl("lCursor", { fg = P.bg, bg = P.c13 })
+hl("CursorIM", { fg = P.bg, bg = P.c14 })
+hl("CursorLine", { bg = blend(P.c0, "#000000", 0.35) })
+hl("CursorColumn", { bg = blend(P.c0, "#000000", 0.35) })
+hl("ColorColumn", { bg = blend(P.c0, "#000000", 0.50) })
+
+-- Numéros de ligne / SignColumn
+hl("LineNr", { fg = P.c8, bg = bgc(P.bg) })
+hl("LineNrAbove", { fg = P.c8, bg = bgc(P.bg) })
+hl("LineNrBelow", { fg = P.c8, bg = bgc(P.bg) })
+hl("CursorLineNr", { fg = P.c11, bg = bgc(P.bg), bold = true })
+hl("CursorLineFold", { fg = P.c8, bg = bgc(P.bg) })
+hl("CursorLineSign", { fg = P.c8, bg = bgc(P.bg) })
+hl("SignColumn", { fg = P.c8, bg = bgc(P.bg) })
+
+-- Recherche / Visual (surlignages visibles)
+hl("Search", { fg = P.bg, bg = P.accent1, bold = true })
+hl("IncSearch", { fg = P.bg, bg = P.accent2, bold = true })
+hl("CurSearch", { fg = P.bg, bg = P.accent1, bold = true })
+hl("Visual", { bg = blend(P.c8, "#000000", 0.35) })
+hl("VisualNOS", { bg = blend(P.c8, "#000000", 0.35) })
+
+-- Diff
+hl("DiffAdd", { fg = P.c10, bg = blend(P.c0, "#000000", 0.35) })
+hl("DiffChange", { fg = P.c11, bg = blend(P.c0, "#000000", 0.35) })
+hl("DiffDelete", { fg = P.c1, bg = blend(P.c0, "#000000", 0.35) })
+hl("DiffText", { fg = P.bg, bg = P.accent2, bold = true })
+
+-- Messages / UI
+hl("ModeMsg", { fg = P.c10, bg = bgc(P.bg), bold = true })
+hl("MsgArea", { fg = P.fg, bg = bgc(P.bg) })
+hl("MsgSeparator", { fg = P.c8, bg = bgc(P.bg) })
+hl("MoreMsg", { fg = P.c10, bg = bgc(P.bg) })
+hl("ErrorMsg", { fg = P.bg, bg = P.c1, bold = true })
+hl("WarningMsg", { fg = P.c11, bg = bgc(P.bg), bold = true })
+hl("Question", { fg = P.c14, bg = bgc(P.bg), bold = true })
+
+-- NonText / EoB / Whitespace
+hl("NonText", { fg = P.c8, bg = bgc(P.bg) })
+hl("EndOfBuffer", { fg = P.c8, bg = bgc(P.bg) })
+hl("SpecialKey", { fg = P.c8, bg = bgc(P.bg) })
+hl("Whitespace", { fg = P.c8 })
+
+-- Pmenu (completion) — garder un fond lisible même en transparent
+hl("Pmenu", { fg = P.fg, bg = blend(P.c0, "#000000", 0.50) })
+hl("PmenuSel", { fg = P.bg, bg = P.accent1, bold = true })
+hl("PmenuSbar", { bg = blend(P.c0, "#000000", 0.50) })
+hl("PmenuThumb", { bg = blend(P.c8, "#000000", 0.60) })
+hl("PmenuKind", { fg = P.c12, bg = blend(P.c0, "#000000", 0.50) })
+hl("PmenuKindSel", { fg = P.bg, bg = P.c12, bold = true })
+hl("PmenuExtra", { fg = P.c7, bg = blend(P.c0, "#000000", 0.50) })
+hl("PmenuExtraSel", { fg = P.bg, bg = P.c7, bold = true })
+hl("PmenuMatch", { fg = P.accent2, bg = blend(P.c0, "#000000", 0.50), bold = true })
+hl("PmenuMatchSel", { fg = P.bg, bg = P.accent2, bold = true })
+hl("ComplMatchIns", { fg = P.accent2, bg = blend(P.c0, "#000000", 0.50) })
+
+-- Statusline / Tabline
+hl("StatusLine", { fg = P.text, bg = bgc(P.c0), bold = true })
+hl("StatusLineNC", { fg = P.c8, bg = bgc(P.c0) })
+hl("StatusLineTerm", { fg = P.text, bg = bgc(P.c0), bold = true })
+hl("StatusLineTermNC", { fg = P.c8, bg = bgc(P.c0) })
+
+hl("TabLine", { fg = P.c8, bg = bgc(P.c0) })
+hl("TabLineSel", { fg = P.text, bg = P.c2, bold = true })
+hl("TabLineFill", { bg = bgc(P.c0) })
+
+-- WinBar
+hl("WinBar", { fg = P.text, bg = bgc(P.c0) })
+hl("WinBarNC", { fg = P.c8, bg = bgc(P.c0) })
+
+-- Syntaxe
+hl("Comment", { fg = P.c8, italic = true })
+hl("Constant", { fg = P.c11 })
+hl("String", { fg = P.c10 })
+hl("Character", { fg = P.c10 })
+hl("Number", { fg = P.c11 })
+hl("Boolean", { fg = P.c11, bold = true })
+hl("Float", { fg = P.c11 })
+
+hl("Identifier", { fg = P.c14 })
+hl("Function", { fg = P.c12, bold = true })
+
+hl("Statement", { fg = P.c9 })
+hl("Conditional", { fg = P.c9 })
+hl("Repeat", { fg = P.c9 })
+hl("Label", { fg = P.c9 })
+hl("Operator", { fg = P.c7 })
+hl("Keyword", { fg = P.c9, italic = true })
+hl("Exception", { fg = P.c9 })
+
+hl("PreProc", { fg = P.c13 })
+hl("Include", { fg = P.c13 })
+hl("Define", { fg = P.c13 })
+hl("Macro", { fg = P.c13 })
+hl("PreCondit", { fg = P.c13 })
+
+hl("Type", { fg = P.c4 })
+hl("StorageClass", { fg = P.c4 })
+hl("Structure", { fg = P.c4 })
+hl("Typedef", { fg = P.c4 })
+
+hl("Special", { fg = P.c6 })
+hl("SpecialComment", { fg = P.c8, italic = true })
+hl("Underlined", { underline = true })
+hl("Bold", { bold = true })
+hl("Italic", { italic = true })
+
+-- Fold
+hl("Folded", { fg = P.c7, bg = blend(P.c0, "#000000", 0.35) })
+hl("FoldColumn", { fg = P.c8, bg = bgc(P.bg) })
+
+-- Matching
+hl("MatchParen", { fg = P.bg, bg = P.accent2, bold = true })
+
+-- Spell
+hl("SpellBad", { sp = P.c1, undercurl = true })
+hl("SpellCap", { sp = P.c11, undercurl = true })
+hl("SpellLocal", { sp = P.c12, undercurl = true })
+hl("SpellRare", { sp = P.c13, undercurl = true })
+
+-- Terminal cursor
+hl("TermCursor", { fg = P.bg, bg = P.c12 })
+
+-- Divers
+hl("Directory", { fg = P.c12 })
+hl("Title", { fg = P.c12, bold = true })
+hl("QuickFixLine", { fg = P.fg, bg = bgc(P.c0), bold = true })
+hl("Substitute", { fg = P.bg, bg = P.accent2, bold = true })
+
+-- Treesitter (principaux)
+hl("@variable", { fg = P.fg })
+hl("@function", { fg = P.c12, bold = true })
+hl("@parameter", { fg = P.c14 })
+hl("@property", { fg = P.c7 })
+hl("@keyword", { fg = P.c9, italic = true })
+hl("@type", { fg = P.c4 })
+hl("@constant", { fg = P.c11 })
+hl("@string", { fg = P.c10 })
+hl("@number", { fg = P.c11 })
+hl("@boolean", { fg = P.c11, bold = true })
+hl("@operator", { fg = P.c7 })
+hl("@punctuation", { fg = P.c7 })
+
+-- Diagnostics (LSP)
+hl("DiagnosticError", { fg = P.c1 })
+hl("DiagnosticWarn", { fg = P.c11 })
+hl("DiagnosticInfo", { fg = P.c14 })
+hl("DiagnosticHint", { fg = P.c12 })
+hl("DiagnosticOk", { fg = P.c10 })
+hl("DiagnosticUnderlineError", { sp = P.c1, underline = true })
+hl("DiagnosticUnderlineWarn", { sp = P.c11, underline = true })
+hl("DiagnosticUnderlineInfo", { sp = P.c14, underline = true })
+hl("DiagnosticUnderlineHint", { sp = P.c12, underline = true })
+
+-- (Optionnel) Surlignage des références LSP
+hl("LspReferenceText", { bg = blend(P.c14, "#000000", 0.20) })
+hl("LspReferenceRead", { bg = blend(P.c14, "#000000", 0.20) })
+hl("LspReferenceWrite", { bg = blend(P.c12, "#000000", 0.20) })
+
+-- mini.statusline — couleurs par mode + segments
+pcall(function()
+	hl("MiniStatuslineDevinfo", { fg = P.fg, bg = bgc(P.c0) })
+	hl("MiniStatuslineFileinfo", { fg = P.fg, bg = bgc(P.c0) })
+	-- Segment NOM DE FICHIER : assombri (pas transparent pour la lisibilité)
+	hl("MiniStatuslineFilename", { fg = P.text, bg = bg_40 })
+
+	hl("MiniStatuslineModeNormal", { fg = P.bg, bg = P.c12, bold = true })
+	hl("MiniStatuslineModeInsert", { fg = P.bg, bg = P.c10, bold = true })
+	hl("MiniStatuslineModeVisual", { fg = P.bg, bg = P.c11, bold = true })
+	hl("MiniStatuslineModeReplace", { fg = P.bg, bg = P.c9, bold = true })
+	hl("MiniStatuslineModeCommand", { fg = P.bg, bg = P.c14, bold = true })
+	hl("MiniStatuslineModeOther", { fg = P.bg, bg = P.c13, bold = true })
+
+	hl("MiniStatuslineInactive", { fg = P.c8, bg = bgc(P.c0) })
+end)

@@ -1,0 +1,6 @@
+{
+  "name": "arial-base",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/nvim/colors/current.lua"
+}

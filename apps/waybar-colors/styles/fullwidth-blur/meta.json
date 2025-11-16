@@ -1,0 +1,6 @@
+{
+  "name": "FullWidth Blur",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/waybar/style.css"
+}

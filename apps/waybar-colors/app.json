@@ -1,0 +1,4 @@
+{
+  "name": "waybar",
+  "reload_cmd": "echo waybar"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "arial-style1",
+  "type": "template",
+  "src": "config.j2",
+  "target": "~/.config/waybar/style.css"
+}
